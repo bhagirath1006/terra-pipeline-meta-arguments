@@ -30,7 +30,7 @@ resource "aws_subnet" "main" {
   map_public_ip_on_launch = true
 
   lifecycle {
-    ignore_changes = all
+    ignore_changes = [all]
   }
 
   tags = {
@@ -45,7 +45,7 @@ resource "aws_internet_gateway" "main" {
 
   lifecycle {
     create_before_destroy = true
-    ignore_changes = all
+    ignore_changes        = [all]
   }
 
   tags = {
@@ -64,7 +64,7 @@ resource "aws_route_table" "main" {
   }
 
   lifecycle {
-    ignore_changes = all
+    ignore_changes = [all]
   }
 
   tags = {
