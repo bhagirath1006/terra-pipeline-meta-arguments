@@ -29,6 +29,10 @@ resource "aws_subnet" "main" {
   availability_zone       = data.aws_availability_zones.available.names[0]
   map_public_ip_on_launch = true
 
+  lifecycle {
+    ignore_changes = all
+  }
+
   tags = {
     Name = "${var.project_name}-subnet-${count.index + 1}"
   }
@@ -41,6 +45,7 @@ resource "aws_internet_gateway" "main" {
 
   lifecycle {
     create_before_destroy = true
+    ignore_changes = all
   }
 
   tags = {
@@ -56,6 +61,10 @@ resource "aws_route_table" "main" {
   route {
     cidr_block = "0.0.0.0/0"
     gateway_id = aws_internet_gateway.main[count.index].id
+  }
+
+  lifecycle {
+    ignore_changes = all
   }
 
   tags = {
