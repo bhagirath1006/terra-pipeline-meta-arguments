@@ -15,5 +15,5 @@ output "instance_ips" {
 
 output "iam_role_arn" {
   description = "IAM role ARN"
-  value       = try(aws_iam_role.main[0].arn, data.aws_iam_role.existing.arn)
+  value       = aws_iam_role.main.arn
 }

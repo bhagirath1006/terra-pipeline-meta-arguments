@@ -53,15 +53,9 @@ resource "aws_instance" "main" {
   }
 }
 
-# Check if IAM role already exists
-data "aws_iam_role" "existing" {
-  name = "${var.project_name}-e"
-}
-
-# IAM role for EC2 instances - only create if it doesn't exist
+# IAM role for EC2 instances - use existing or create new
 resource "aws_iam_role" "main" {
-  count = data.aws_iam_role.existing.arn == null ? 1 : 0
-  name  = "${var.project_name}-e"
+  name = "${var.project_name}-e"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -76,6 +70,10 @@ resource "aws_iam_role" "main" {
     ]
   })
 
+  lifecycle {
+    ignore_changes = all
+  }
+
   tags = {
     Name = "${var.project_name}-ec2-role"
   }
@@ -84,7 +82,7 @@ resource "aws_iam_role" "main" {
 # IAM instance profile - use existing if available, otherwise create
 resource "aws_iam_instance_profile" "main" {
   name = "${var.project_name}-ec2-profile"
-  role = try(aws_iam_role.main[0].name, data.aws_iam_role.existing.name)
+  role = aws_iam_role.main.name
 
   lifecycle {
     ignore_changes = all
