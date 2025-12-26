@@ -81,6 +81,6 @@ resource "aws_iam_instance_profile" "main" {
   role = aws_iam_role.main.name
 
   lifecycle {
-    ignore_changes = [all]
+    ignore_changes = all
   }
 }
