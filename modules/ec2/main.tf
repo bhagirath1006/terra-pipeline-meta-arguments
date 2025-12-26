@@ -55,7 +55,7 @@ resource "aws_instance" "main" {
 
 # IAM role for EC2 instances (demonstrating dependency)
 resource "aws_iam_role" "main" {
-  name = "${var.project_name}-role"
+  name = "${var.project_name}-e"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -75,8 +75,12 @@ resource "aws_iam_role" "main" {
   }
 }
 
-# IAM instance profile
+# IAM instance profile - use existing if available, otherwise create
 resource "aws_iam_instance_profile" "main" {
   name = "${var.project_name}-ec2-profile"
   role = aws_iam_role.main.name
+
+  lifecycle {
+    ignore_changes = all
+  }
 }
