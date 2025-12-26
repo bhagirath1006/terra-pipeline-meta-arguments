@@ -40,12 +40,12 @@ resource "aws_security_group_rule" "ingress_flattened" {
 
 # Egress rule for all security groups
 resource "aws_security_group_rule" "egress" {
-  for_each = aws_security_group.main
+  for_each = var.security_groups
 
   type              = "egress"
   from_port         = 0
   to_port           = 0
   protocol          = "-1"
   cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = each.value.id
+  security_group_id = aws_security_group.main[each.key].id
 }
