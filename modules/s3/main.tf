@@ -25,12 +25,12 @@ resource "aws_s3_bucket" "bucket" {
 
 # Versioning configuration using Terraform functions
 resource "aws_s3_bucket_versioning" "ver" {
-  for_each = aws_s3_bucket.bucket
+  for_each = var.buckets
 
-  bucket = each.value.id
+  bucket = aws_s3_bucket.bucket[each.key].id
 
   versioning_configuration {
-    status = var.buckets[each.key].versioning ? "Enabled" : "Suspended"
+    status = each.value.versioning ? "Enabled" : "Suspended"
   }
 
   depends_on = [
@@ -40,8 +40,8 @@ resource "aws_s3_bucket_versioning" "ver" {
 
 # Server-side encryption using Terraform functions
 resource "aws_s3_bucket_server_side_encryption_configuration" "enc" {
-  count  = var.enable_encryption ? length(aws_s3_bucket.bucket) : 0
-  bucket = values(aws_s3_bucket.bucket)[count.index].id
+  for_each = var.enable_encryption ? var.buckets : {}
+  bucket   = aws_s3_bucket.bucket[each.key].id
 
   rule {
     apply_server_side_encryption_by_default {
@@ -56,9 +56,9 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "enc" {
 
 # Block public access
 resource "aws_s3_bucket_public_access_block" "pab" {
-  for_each = aws_s3_bucket.bucket
+  for_each = var.buckets
 
-  bucket = each.value.id
+  bucket = aws_s3_bucket.bucket[each.key].id
 
   block_public_acls       = true
   block_public_policy     = true
@@ -69,9 +69,9 @@ resource "aws_s3_bucket_public_access_block" "pab" {
 # Bucket lifecycle policy with Terraform functions
 # Demonstrates: tolist(), merge(), and conditional logic
 resource "aws_s3_bucket_lifecycle_configuration" "lc" {
-  for_each = aws_s3_bucket.bucket
+  for_each = var.buckets
 
-  bucket = each.value.id
+  bucket = aws_s3_bucket.bucket[each.key].id
 
   rule {
     id     = "archive-old-logs"
